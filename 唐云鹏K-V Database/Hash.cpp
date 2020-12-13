@@ -1,10 +1,12 @@
 #include "Hash.h"
+
 Hash::~Hash()
 {
 	for (int i = 0; i <= HASHMAX - 1; i++)
 		while (!root[i].empty())
 			root[i].pop_back();
 }
+
 int Hash::GetHashCode(string str)
 {
 	int hash = 0, n = str.length();
@@ -12,23 +14,25 @@ int Hash::GetHashCode(string str)
 		hash = str[i] + (HASHMAX * hash);
 	return hash % HASHMAX;
 }
+
 void Hash::set(string key, int offset)
 {
 	int hashcode = GetHashCode(key);
-	DataNode s;
+	HashDataNode s;
 	s.key = key; s.offset = offset;
 	root[hashcode].push_back(s);
 }
+
 int Hash::get(string key)
 {
 	int hashcode = GetHashCode(key);
-	list<DataNode> s = root[hashcode];
-	list<DataNode>::iterator it = s.begin();
+	list<HashDataNode> s = root[hashcode];
+	list<HashDataNode>::iterator it = s.begin();
 	int offset = -1;
 
 	for (; it != s.end(); it++)
 	{
-		DataNode data = *it;
+		HashDataNode data = *it;
 		if (data.key == key)
 		{
 			offset = data.offset;
@@ -36,6 +40,7 @@ int Hash::get(string key)
 	}
 	return offset;
 }
+
 void Hash::clear()
 {
 	for (int i = 0; i <= HASHMAX - 1; i++)

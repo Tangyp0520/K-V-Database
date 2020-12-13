@@ -1,33 +1,12 @@
 #include<iostream>
 #include<string>
-#include"ABnomalReturn.h"
+#include"ErrorReturnValue.h"
 #include"KVDBHandler.h"
 using namespace std;
-/*int main()
-{
-	int time, comtime;
-	cout << "This is the test program" << endl;
-	cout << "Please enter the number of tests you want: ";
-	cin >> time;
-	cout << endl;
-	cout << "Please enter the number of commands you want to execute per test: ";
-	cin >> comtime;
-	cout << endl;
-	while (time--)
-	{
-		KVDBHandler* handler;
-		handler = new KVDBHandler("test.txt");
-		string command;
-		for (int i = 0; i <= comtime - 1; i++)
-		{
-
-		}
-	}
-}*/
 int main()
 {
 	KVDBHandler* handler;
-	handler = new KVDBHandler("test.txt");
+	handler = new KVDBHandler("KVDB.txt");
 	string command;
 	while (1)
 	{
@@ -66,14 +45,16 @@ int main()
 				cout << "Get success" << endl << key << "'s value=" << value << endl;
 			else if (flag == KEY_NOT_EXIST)
 				cout << "Get failed! Key does not exist" << endl;
-			else if (flag == KEY_DELETED)
+			else if (flag == KEY_HAS_BEEN_DELETED)
 				cout << "Get failed! Key has been deleted" << endl;
 			else if (flag == MEOMORY_ALLOCATION_FAILUER)
 				cout << "MEOMORY_ALLOCATION_FAILUER" << endl;
 			else if (flag == FILE_OPENIBG_FAILED)
 				cout << "FILE_OPENIBG_FAILED" << endl;
-			else if (flag == -6)
+			else if (flag == -1)
 				cout << "FILE_OPENIBG_FAILED" << endl;
+			else if (flag == -6)
+				cout << "OVERDUE_KEY" << endl;
 		}
 		else if (command == "3")
 		{
@@ -85,7 +66,7 @@ int main()
 				cout << "Dellete success!" << endl;
 			else if (flag == KEY_NOT_EXIST)
 				cout << "Delete failed! Key does not exist" << endl;
-			else if (flag == KEY_DELETED)
+			else if (flag == KEY_HAS_BEEN_DELETED)
 				cout << "Delete failed! Key has been deleted" << endl;
 			else if (flag == MEOMORY_ALLOCATION_FAILUER)
 				cout << "MEOMORY_ALLOCATION_FAILUER" << endl;
@@ -105,11 +86,9 @@ int main()
 			int n;
 			cout << "key=";
 			cin >> key;
-			cout << endl;
 			cout << key << "'s life cycle=";
 			cin >> n;
-			cout << endl;
-			int flag = expires(handler,key,n);
+			int flag = expires(handler, key, n);
 			if (flag == SUCCESS)
 				cout << "Expires success" << endl;
 			else cout << "Expires failed!" << endl;

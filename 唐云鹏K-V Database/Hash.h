@@ -3,15 +3,17 @@
 #include<list>
 using namespace std;
 #define HASHMAX 127
-struct DataNode
+
+struct HashDataNode
 {
 	string key = "";
 	int offset = 0;
 };
+
 class Hash
 {
 public:
-	list<DataNode> root[HASHMAX];
+	list<HashDataNode> root[HASHMAX];
 	~Hash();
 	int GetHashCode(string str);
 	void set(string key, int offset);
