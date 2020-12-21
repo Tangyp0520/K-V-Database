@@ -142,11 +142,13 @@
     <ClCompile Include="Hash.cpp" />
     <ClCompile Include="KVDBHandler.cpp" />
     <ClCompile Include="MAIN.cpp" />
+    <ClCompile Include="MinHeap.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ErrorReturnValue.h" />
     <ClInclude Include="Hash.h" />
     <ClInclude Include="KVDBHandler.h" />
+    <ClInclude Include="MinHeap.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

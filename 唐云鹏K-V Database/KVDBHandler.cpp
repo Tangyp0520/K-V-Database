@@ -25,52 +25,39 @@ KVDBHandler::~KVDBHandler()
 	offset = 0;
 }
 
-long long KVDBHandler::getLength()
-{
-	const string filename = KVDB;
-	fstream file;
-	file.open(filename, ios::in | ios::binary);
-	file.seekg(0, ios::end);
-	long long length = file.tellg();
-	file.seekg(0, ios::beg);
-	return length;
-}
-
 void KVDBHandler::readKVDBData(fstream& file, KVDBData& s)
 {
-	int keyLen, valueLen, del, time;
+	int keyLen, valueLen;
 	file.read((char*)&keyLen, sizeof(int));
 	file.read((char*)&valueLen, sizeof(int));
-	file.read((char*)&del, sizeof(int));
-	file.read((char*)&time, sizeof(int));
-	s.keyLen = keyLen; s.valueLen = valueLen;
-	s.del = del; s.time = time;
 	
 	string key, value;
-	char* key_buf = new char[s.keyLen];
-	char* value_buf = new char[s.valueLen];
-	file.read(key_buf, s.keyLen);
-	file.read(value_buf, s.valueLen);
-	for (int i = 0; i <= s.keyLen - 1; i++)
+	char* key_buf = new char[keyLen];
+	file.read(key_buf, keyLen);
+	for (int i = 0; i <= keyLen - 1; i++)
 		key.push_back(key_buf[i]);
-	for (int i = 0; i <= s.valueLen - 1; i++)
-		value.push_back(value_buf[i]);
+	delete[]key_buf;
 
-	s.key = key; s.value = value;
-	delete[]key_buf; 
-	delete[]value_buf;
+	if (valueLen != -1)
+	{
+		char* value_buf = new char[valueLen];
+		file.read(value_buf, valueLen);
+		for (int i = 0; i <= valueLen - 1; i++)
+			value.push_back(value_buf[i]);
+		delete[]value_buf;
+	}
+	else value = "";
+
+	s.set(keyLen, valueLen, key, value);
 }
 
 void KVDBHandler::writeKVDBData(fstream& file, KVDBData& s)
 {
 	int keyLen = s.keyLen, valueLen = s.valueLen;
 	string key = s.key, value = s.value;
-	int del = s.del, time = s.time;
 
 	file.write((char*)&keyLen, sizeof(int));
 	file.write((char*)&valueLen, sizeof(int));
-	file.write((char*)&del, sizeof(int));
-	file.write((char*)&time, sizeof(int));
 
 	file.write(key.c_str(), keyLen);
 	file.write(value.c_str(), valueLen);
@@ -85,19 +72,19 @@ void KVDBHandler::resetIndex()
 	fstream file;
 	file.open(filename, ios::in | ios::binary);
 	file.seekg(0, ios::end);
-	long long x = file.tellg();
+	int length = file.tellg();
 	file.seekg(0, ios::beg);
 
-	int length = x;
 	while (length != 0)
 	{
 		KVDBData s;
 		readKVDBData(file, s);
-
-		length -= sizeof(int) * 4 + s.keyLen + s.valueLen;
+		if (s.valueLen == -1)
+			s.valueLen = 0;
+		length -= sizeof(int) * 2 + s.keyLen + s.valueLen;
 
 		index.set(s.key, offset);
-		offset += sizeof(int) * 4 + s.keyLen + s.valueLen;
+		offset += sizeof(int) * 2 + s.keyLen + s.valueLen;
 	}
 
 	file.close();
@@ -112,18 +99,30 @@ int set(KVDBHandler* handler, const string& key, const string& value)
 		return FILE_OPENIBG_FAILED;
 
 	KVDBData s;
-	s.keyLen = key.length(); s.valueLen = value.length();
-	s.key = key; s.value = value;
-	s.time = 0; s.del = 0;
+	s.set(key.length(), value.length(), key, value);
+
 	handler->writeKVDBData(file, s);
 	handler->index.set(key, handler->offset);
-	handler->offset += sizeof(int) * 4 + s.keyLen + s.valueLen;
+	handler->offset += sizeof(int) * 2 + s.keyLen + s.valueLen;
+	handler->minHeap.set(key, KEY_NOT_EXIST_IN_MINHEAP);
 	file.close();
 	return SUCCESS;
 }
 
 int get(KVDBHandler* handler, const string& key, string& value)
 {
+	int keyTime = handler->minHeap.get(key);
+	if (keyTime == OVERDUE_KEY)
+		return OVERDUE_KEY;
+	if (keyTime != KEY_NOT_EXIST_IN_MINHEAP && keyTime != OVERDUE_KEY)
+	{
+		time_t cur = time(NULL);
+		if (keyTime <= cur)
+		{
+			handler->minHeap.del(key);
+			return OVERDUE_KEY;
+		}
+	}
 	const string filename = handler->KVDB;
 	fstream file;
 	file.open(filename, ios::binary | ios::in);
@@ -131,9 +130,7 @@ int get(KVDBHandler* handler, const string& key, string& value)
 		return FILE_OPENIBG_FAILED;
 
 	KVDBData s;
-	s.keyLen = key.length(); s.valueLen = value.length();
-	s.key = key; s.value = value;
-	s.time = 0; s.del = 0;
+	s.set(key.length(), value.length(), key, value);
 
 	int offset = handler->index.get(key);
 	if (offset == -1)
@@ -149,15 +146,8 @@ int get(KVDBHandler* handler, const string& key, string& value)
 	file.close();
 
 	int flag = SUCCESS;
-	if (s.del == 1)
+	if (s.valueLen == -1)
 		return KEY_HAS_BEEN_DELETED;
-	if (s.time > 0)
-	{
-		time_t cur = time(NULL);
-		if (cur < s.time)
-			return SUCCESS;
-		else return OVERDUE_KEY;
-	}
 	return SUCCESS;
 }
 int del(KVDBHandler* handler, const std::string& key)
@@ -175,12 +165,12 @@ int del(KVDBHandler* handler, const std::string& key)
 		return FILE_OPENIBG_FAILED;
 
 	KVDBData s;
-	s.keyLen = key.length(); s.valueLen = value.length();
-	s.key = key; s.value = value;
-	s.time = 0; s.del = 1;
+	s.set(key.length(), -1, key, value);
+
 	handler->writeKVDBData(file, s);
 	handler->index.set(key, handler->offset);
-	handler->offset += sizeof(int) * 4 + s.keyLen + s.valueLen;
+	handler->minHeap.del(key);
+	handler->offset += sizeof(int) * 2 + s.keyLen + s.valueLen;
 	file.close();
 	return SUCCESS;
 }
@@ -248,26 +238,12 @@ int purgeSubfunction(KVDBHandler* handler, KVDBHandler* save_handler)
 }
 int expires(KVDBHandler* handler, const string key, int n)
 {
-	string value = "KEY_HAS_BEEN_DELETED";
-
+	string value;
 	int flag = get(handler, key, value);
-	if (flag != SUCCESS)
-		return flag;
-
-	const string filename = handler->KVDB;
-	fstream file;
-	file.open(filename, ios::binary | ios::app);
-	if (!file)
-		return FILE_OPENIBG_FAILED;
-
-	time_t cur = time(NULL);
-	KVDBData s;
-	s.keyLen = key.length(); s.valueLen = value.length();
-	s.key = key; s.value = value;
-	s.time = cur + n; s.del = 0;
-	handler->writeKVDBData(file, s);
-	handler->index.set(key, handler->offset);
-	handler->offset += sizeof(int) * 4 + s.keyLen + s.valueLen;
-	file.close();
-	return SUCCESS;
+	if (flag == SUCCESS)
+	{
+		time_t cur = time(NULL);
+		handler->minHeap.set(key, cur + n);
+	}
+	return flag;
 }

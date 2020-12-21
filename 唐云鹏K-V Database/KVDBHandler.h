@@ -5,6 +5,7 @@
 #include<ctime>
 #include"ErrorReturnValue.h"
 #include"Hash.h"
+#include"MinHeap.h"
 
 struct KVDBData
 {
@@ -12,8 +13,11 @@ struct KVDBData
 	int valueLen = 0;
 	string key = "";
 	string value = "";
-	int del = 0;
-	int time = 0;
+	void set(int keyLen1, int valueLen1, string key1, string value1)
+	{
+		keyLen = keyLen1; valueLen = valueLen1;
+		key = key1; value = value1;
+	}
 };
 
 class KVDBHandler
@@ -21,11 +25,11 @@ class KVDBHandler
 public:
 	string KVDB;
 	Hash index;
+	MinHeap minHeap;
 	int offset;
 
 	KVDBHandler(const string& db_file);
 	~KVDBHandler();
-	long long getLength();
 	void resetIndex();
 	void readKVDBData(fstream& file, KVDBData& s);
 	void writeKVDBData(fstream& file, KVDBData& s);

@@ -51,10 +51,10 @@ int main()
 				cout << "MEOMORY_ALLOCATION_FAILUER" << endl;
 			else if (flag == FILE_OPENIBG_FAILED)
 				cout << "FILE_OPENIBG_FAILED" << endl;
-			else if (flag == -1)
-				cout << "FILE_OPENIBG_FAILED" << endl;
-			else if (flag == -6)
+			else if (flag == OVERDUE_KEY)
 				cout << "OVERDUE_KEY" << endl;
+			else if (flag == KEY_NOT_EXIST_IN_MINHEAP)
+				cout << "KEY_NOT_EXIST_IN_MINHEAP" << endl;
 		}
 		else if (command == "3")
 		{
@@ -91,7 +91,18 @@ int main()
 			int flag = expires(handler, key, n);
 			if (flag == SUCCESS)
 				cout << "Expires success" << endl;
-			else cout << "Expires failed!" << endl;
+			else if (flag == KEY_NOT_EXIST)
+				cout << "Expires failed! Key does not exist" << endl;
+			else if (flag == KEY_HAS_BEEN_DELETED)
+				cout << "Expires failed! Key has been deleted" << endl;
+			else if (flag == MEOMORY_ALLOCATION_FAILUER)
+				cout << "MEOMORY_ALLOCATION_FAILUER" << endl;
+			else if (flag == FILE_OPENIBG_FAILED)
+				cout << "FILE_OPENIBG_FAILED" << endl;
+			else if (flag == OVERDUE_KEY)
+				cout << "OVERDUE_KEY" << endl;
+			else if (flag == KEY_NOT_EXIST_IN_MINHEAP)
+				cout << "KEY_NOT_EXIST_IN_MINHEAP" << endl;
 		}
 		else if (command == "6")
 		{
