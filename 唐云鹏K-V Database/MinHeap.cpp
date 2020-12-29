@@ -13,31 +13,11 @@ MinHeap::MinHeap()
 	}
 	file.close();
 	reset();
-	/*file.seekg(0, ios::end);
-	int length = file.tellg();
-	file.seekg(0, ios::beg);
-	while (length != 0)
-	{
-		TimeNode s;
-		int keyLen;
-		file.read((char*)&keyLen, sizeof(int));
-		file.read((char*)&s.time, sizeof(int));
-		char* key_buf = new char[keyLen];
-		file.read(key_buf, keyLen);
-		for (int i = 0; i < keyLen; i++)
-			s.key.push_back(key_buf[i]);
-		
-		if (s.time != KEY_NOT_EXIST_IN_MINHEAP)
-			minHeap.push(s);
-
-		length -= sizeof(int) * 2 + keyLen;
-		delete[]key_buf;
-	}
-	file.close();*/
 }
 MinHeap::~MinHeap()
 {
 	MinHeap_filename.clear();
+	index.clear();
 	while (!minHeap.empty())
 	{
 		minHeap.pop();
@@ -45,6 +25,7 @@ MinHeap::~MinHeap()
 }
 void MinHeap::reset()
 {
+	index.clear();
 	while (!minHeap.empty())
 	{
 		minHeap.pop();
@@ -57,6 +38,7 @@ void MinHeap::reset()
 	int length = file.tellg();
 	file.seekg(0, ios::beg);
 
+	time_t cur = time(NULL);
 	while (length != 0)
 	{
 		TimeNode s;
@@ -68,8 +50,11 @@ void MinHeap::reset()
 		for (int i = 0; i < keyLen; i++)
 			s.key.push_back(key_buf[i]);
 
-		if (s.time != KEY_NOT_EXIST_IN_MINHEAP)
+		if (s.time >= cur)
+		{
 			minHeap.push(s);
+			index.set(s.key, KEY_EXIST_IN_MINHEAP);
+		}
 
 		length -= sizeof(int) * 2 + keyLen;
 		delete[]key_buf;
@@ -90,18 +75,25 @@ void MinHeap::set(string key, int time)
 	TimeNode s;
 	s.key = key; s.time = time;
 	minHeap.push(s);
+
+	int offset = KEY_EXIST_IN_MINHEAP;
+	if (time == KEY_NOT_EXIST_IN_MINHEAP)
+		offset = KEY_NOT_EXIST_IN_MINHEAP;
+	index.set(key, offset);
 }
 
 int MinHeap::get(string key)
 {
-	int time = KEY_NOT_EXIST_IN_MINHEAP;
+	int re = index.get(key);
+	if (re == KEY_NOT_EXIST || re == KEY_NOT_EXIST_IN_MINHEAP)
+		return true;
+	bool flag = false;
 	priority_queue<TimeNode, vector<TimeNode>, cmp> mid;
 	while (!minHeap.empty())
 	{
 		if (minHeap.top().key == key)
 		{
-			time = minHeap.top().time;
-			break;
+			flag = true;
 		}
 		mid.push(minHeap.top());
 		minHeap.pop();
@@ -111,24 +103,18 @@ int MinHeap::get(string key)
 		minHeap.push(mid.top());
 		mid.pop();
 	}
-	return time;
+	return flag;
 }
 
-void MinHeap::del(string key)
+void MinHeap::del()
 {
-	priority_queue<TimeNode, vector<TimeNode>, cmp> mid;
-	while (!minHeap.empty())
+	time_t cur = time(NULL);
+	while (1)
 	{
-		if (minHeap.top().key != key)
-			mid.push(minHeap.top());
-
-		minHeap.pop();
+		if (minHeap.empty())
+			break;
+		if (minHeap.top().time < cur)
+			minHeap.pop();
+		else break;
 	}
-
-	while (!mid.empty())
-	{
-		minHeap.push(mid.top());
-		mid.pop();
-	}
-	set(key, OVERDUE_KEY);
 }

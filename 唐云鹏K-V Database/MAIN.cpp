@@ -31,9 +31,7 @@ int main()
 			cout << "value=";
 			cin >> value;
 			int flag = set(handler, key, value);
-			if (flag == FILE_OPENIBG_FAILED)
-				cout << "FILE_OPENIBG_FAILED!" << endl << "Set failed";
-			else cout << "Set success" << endl;
+			cout << "Set success" << endl;
 		}
 		else if (command == "2")
 		{
@@ -47,14 +45,8 @@ int main()
 				cout << "Get failed! Key does not exist" << endl;
 			else if (flag == KEY_HAS_BEEN_DELETED)
 				cout << "Get failed! Key has been deleted" << endl;
-			else if (flag == MEOMORY_ALLOCATION_FAILUER)
-				cout << "MEOMORY_ALLOCATION_FAILUER" << endl;
-			else if (flag == FILE_OPENIBG_FAILED)
-				cout << "FILE_OPENIBG_FAILED" << endl;
 			else if (flag == OVERDUE_KEY)
-				cout << "OVERDUE_KEY" << endl;
-			else if (flag == KEY_NOT_EXIST_IN_MINHEAP)
-				cout << "KEY_NOT_EXIST_IN_MINHEAP" << endl;
+				cout << "Get failed! Key has expired" << endl;
 		}
 		else if (command == "3")
 		{
@@ -68,10 +60,8 @@ int main()
 				cout << "Delete failed! Key does not exist" << endl;
 			else if (flag == KEY_HAS_BEEN_DELETED)
 				cout << "Delete failed! Key has been deleted" << endl;
-			else if (flag == MEOMORY_ALLOCATION_FAILUER)
-				cout << "MEOMORY_ALLOCATION_FAILUER" << endl;
-			else if (flag == FILE_OPENIBG_FAILED)
-				cout << "FILE_OPENIBG_FAILED" << endl;
+			else if (flag == OVERDUE_KEY)
+				cout << "Get failed! Key has expired" << endl;
 		}
 		else if (command == "4")
 		{
@@ -95,14 +85,8 @@ int main()
 				cout << "Expires failed! Key does not exist" << endl;
 			else if (flag == KEY_HAS_BEEN_DELETED)
 				cout << "Expires failed! Key has been deleted" << endl;
-			else if (flag == MEOMORY_ALLOCATION_FAILUER)
-				cout << "MEOMORY_ALLOCATION_FAILUER" << endl;
-			else if (flag == FILE_OPENIBG_FAILED)
-				cout << "FILE_OPENIBG_FAILED" << endl;
 			else if (flag == OVERDUE_KEY)
 				cout << "OVERDUE_KEY" << endl;
-			else if (flag == KEY_NOT_EXIST_IN_MINHEAP)
-				cout << "KEY_NOT_EXIST_IN_MINHEAP" << endl;
 		}
 		else if (command == "6")
 		{

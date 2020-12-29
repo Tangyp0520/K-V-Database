@@ -1,14 +1,10 @@
 #pragma once
 #include<iostream>
 #include<list>
+#include"DataStruct.h"
+#include"ErrorReturnValue.h"
 using namespace std;
 #define HASHMAX 127
-
-struct HashDataNode
-{
-	string key = "";
-	int offset = 0;
-};
 
 class Hash
 {

@@ -95,8 +95,6 @@ int set(KVDBHandler* handler, const string& key, const string& value)
 	const string filename = handler->KVDB;
 	fstream file;
 	file.open(filename, ios::binary | ios::app);
-	if (!file)
-		return FILE_OPENIBG_FAILED;
 
 	KVDBData s;
 	s.set(key.length(), value.length(), key, value);
@@ -111,32 +109,27 @@ int set(KVDBHandler* handler, const string& key, const string& value)
 
 int get(KVDBHandler* handler, const string& key, string& value)
 {
-	int keyTime = handler->minHeap.get(key);
-	if (keyTime == OVERDUE_KEY)
-		return OVERDUE_KEY;
-	if (keyTime != KEY_NOT_EXIST_IN_MINHEAP && keyTime != OVERDUE_KEY)
-	{
-		time_t cur = time(NULL);
-		if (keyTime <= cur)
-		{
-			handler->minHeap.del(key);
-			return OVERDUE_KEY;
-		}
-	}
+	handler->minHeap.del();
+
 	const string filename = handler->KVDB;
 	fstream file;
 	file.open(filename, ios::binary | ios::in);
-	if (!file)
-		return FILE_OPENIBG_FAILED;
 
 	KVDBData s;
 	s.set(key.length(), value.length(), key, value);
 
 	int offset = handler->index.get(key);
-	if (offset == -1)
+	if (offset == KEY_NOT_EXIST)
 	{
 		file.close();
 		return KEY_NOT_EXIST;
+	}
+
+	int keyOverdue = handler->minHeap.get(key);
+	if (keyOverdue == false)
+	{
+		file.close();
+		return OVERDUE_KEY;
 	}
 
 	file.seekg(offset, ios::beg);
@@ -161,15 +154,12 @@ int del(KVDBHandler* handler, const std::string& key)
 	const string filename = handler->KVDB;
 	fstream file;
 	file.open(filename, ios::binary | ios::app);
-	if (!file)
-		return FILE_OPENIBG_FAILED;
 
 	KVDBData s;
 	s.set(key.length(), -1, key, value);
 
 	handler->writeKVDBData(file, s);
 	handler->index.set(key, handler->offset);
-	handler->minHeap.del(key);
 	handler->offset += sizeof(int) * 2 + s.keyLen + s.valueLen;
 	file.close();
 	return SUCCESS;
@@ -179,33 +169,9 @@ int purge(KVDBHandler* handler)
 	KVDBHandler* save_handler;
 	save_handler = new KVDBHandler("save_KVDB.txt");
 	int flag;
-
 	flag = purgeSubfunction(handler, save_handler);
-	if (flag == MEOMORY_ALLOCATION_FAILUER)
-	{
-		cout << "MEOMORY_ALLOCATION_FAILUER" << endl;
-		flag = FAILED;
-	}
-	if (flag == ERROR_EXECUTING_SUBFUNCTION)
-	{
-		cout << "ERROR_EXECUTING_SUBFUNCTION" << endl;
-		flag = FAILED;
-	}
-
 	flag = purgeSubfunction(save_handler, handler);
-	if (flag == MEOMORY_ALLOCATION_FAILUER)
-	{
-		cout << "MEOMORY_ALLOCATION_FAILUER" << endl;
-		flag = FAILED;
-	}
-	if (flag == ERROR_EXECUTING_SUBFUNCTION)
-	{
-		cout << "ERROR_EXECUTING_SUBFUNCTION" << endl;
-		flag = FAILED;
-	}
-
 	handler->resetIndex();
-
 	return flag;
 }
 

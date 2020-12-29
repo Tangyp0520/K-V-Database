@@ -2,9 +2,7 @@
 
 Hash::~Hash()
 {
-	for (int i = 0; i <= HASHMAX - 1; i++)
-		while (!root[i].empty())
-			root[i].pop_back();
+	clear();
 }
 
 int Hash::GetHashCode(string str)
@@ -18,9 +16,23 @@ int Hash::GetHashCode(string str)
 void Hash::set(string key, int offset)
 {
 	int hashcode = GetHashCode(key);
-	HashDataNode s;
-	s.key = key; s.offset = offset;
-	root[hashcode].push_back(s);
+	bool flag = false;
+	list<HashDataNode>::iterator it = root[hashcode].begin();
+	for (; it != root[hashcode].end(); it++)
+	{
+		if (it->key == key)
+		{
+			it->offset = offset;
+			flag = true;
+			break;
+		}
+	}
+	if (flag == false)
+	{
+		HashDataNode s;
+		s.key = key; s.offset = offset;
+		root[hashcode].push_back(s);
+	}
 }
 
 int Hash::get(string key)
@@ -28,7 +40,7 @@ int Hash::get(string key)
 	int hashcode = GetHashCode(key);
 	list<HashDataNode> s = root[hashcode];
 	list<HashDataNode>::iterator it = s.begin();
-	int offset = -1;
+	int offset = KEY_NOT_EXIST;
 
 	for (; it != s.end(); it++)
 	{
