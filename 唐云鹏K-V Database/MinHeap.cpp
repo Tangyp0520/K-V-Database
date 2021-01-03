@@ -82,7 +82,7 @@ void MinHeap::set(string key, int time)
 	index.set(key, offset);
 }
 
-int MinHeap::get(string key)
+bool MinHeap::get(string key)
 {
 	int re = index.get(key);
 	if (re == KEY_NOT_EXIST || re == KEY_NOT_EXIST_IN_MINHEAP)

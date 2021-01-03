@@ -7,6 +7,7 @@
 #include"Hash.h"
 #include"MinHeap.h"
 #include"DataStruct.h"
+using namespace std;
 
 class KVDBHandler
 {
@@ -28,4 +29,3 @@ public:
 	friend int purgeSubfunction(KVDBHandler* handler, KVDBHandler* save_handler);
 	friend int expires(KVDBHandler* handler, const string key, int n);
 };
-

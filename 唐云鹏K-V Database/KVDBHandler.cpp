@@ -125,7 +125,7 @@ int get(KVDBHandler* handler, const string& key, string& value)
 		return KEY_NOT_EXIST;
 	}
 
-	int keyOverdue = handler->minHeap.get(key);
+	bool keyOverdue = handler->minHeap.get(key);
 	if (keyOverdue == false)
 	{
 		file.close();

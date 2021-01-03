@@ -2,12 +2,18 @@
 #include<string>
 #include"ErrorReturnValue.h"
 #include"KVDBHandler.h"
+#include"LOGGER.h"
 using namespace std;
+
+
+
 int main()
 {
 	KVDBHandler* handler;
 	handler = new KVDBHandler("KVDB.txt");
 	string command;
+	LOGGER log("LOGGER_file.txt");
+
 	while (1)
 	{
 		cout << "******************************" << endl;
@@ -31,7 +37,11 @@ int main()
 			cout << "value=";
 			cin >> value;
 			int flag = set(handler, key, value);
-			cout << "Set success" << endl;
+			string ans = log.getAns(flag);
+
+			ans = "Set "+ ans + " key=" + key + " value=" + value;
+			log.DEBUG(ans);
+			cout << ans << endl;
 		}
 		else if (command == "2")
 		{
@@ -39,14 +49,14 @@ int main()
 			cout << "key=";
 			cin >> key;
 			int flag = get(handler, key, value);
+			string ans = log.getAns(flag);
+			
+			ans = "Get " + ans;
 			if (flag == SUCCESS)
-				cout << "Get success" << endl << key << "'s value=" << value << endl;
-			else if (flag == KEY_NOT_EXIST)
-				cout << "Get failed! Key does not exist" << endl;
-			else if (flag == KEY_HAS_BEEN_DELETED)
-				cout << "Get failed! Key has been deleted" << endl;
-			else if (flag == OVERDUE_KEY)
-				cout << "Get failed! Key has expired" << endl;
+				ans = ans + " " + key + "'s value=" + value;
+			log.DEBUG(ans);
+			cout << ans << endl;
+
 		}
 		else if (command == "3")
 		{
@@ -54,21 +64,18 @@ int main()
 			cout << "key=";
 			cin >> key;
 			int flag = del(handler, key);
-			if (flag == SUCCESS)
-				cout << "Dellete success!" << endl;
-			else if (flag == KEY_NOT_EXIST)
-				cout << "Delete failed! Key does not exist" << endl;
-			else if (flag == KEY_HAS_BEEN_DELETED)
-				cout << "Delete failed! Key has been deleted" << endl;
-			else if (flag == OVERDUE_KEY)
-				cout << "Get failed! Key has expired" << endl;
+			string ans = log.getAns(flag);
+			ans = "Delete " + ans;
+			log.DEBUG(ans);
+			cout << ans << endl;
 		}
 		else if (command == "4")
 		{
 			int flag = purge(handler);
-			if (flag == SUCCESS)
-				cout << "Purge success" << endl;
-			else cout << "Purge failed!" << endl;
+			string ans = log.getAns(flag);
+			ans = "Purge " + ans;
+			log.DEBUG(ans);
+			cout << ans << endl;
 		}
 		else if (command == "5")
 		{
@@ -79,14 +86,10 @@ int main()
 			cout << key << "'s life cycle=";
 			cin >> n;
 			int flag = expires(handler, key, n);
-			if (flag == SUCCESS)
-				cout << "Expires success" << endl;
-			else if (flag == KEY_NOT_EXIST)
-				cout << "Expires failed! Key does not exist" << endl;
-			else if (flag == KEY_HAS_BEEN_DELETED)
-				cout << "Expires failed! Key has been deleted" << endl;
-			else if (flag == OVERDUE_KEY)
-				cout << "OVERDUE_KEY" << endl;
+			string ans = log.getAns(flag);
+			ans = "Expires " + ans;
+			log.DEBUG(ans);
+			cout << ans << endl;
 		}
 		else if (command == "6")
 		{

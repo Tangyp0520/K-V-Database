@@ -19,7 +19,6 @@ public:
 	~MinHeap();
 	void reset();
 	void set(string key, int time);
-	int get(string key);
+	bool get(string key);
 	void del();
 };
-

@@ -16,4 +16,3 @@ public:
 	int get(string key);
 	void clear();
 };
-
