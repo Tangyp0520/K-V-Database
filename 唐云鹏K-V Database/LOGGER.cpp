@@ -42,7 +42,7 @@ string LOGGER::getAns(int flag)
     else if (flag == ERROR_EXECUTING_SUBFUNCTION)
         ans = "Failed! Purge subroutine failed";
     else if (flag == OVERDUE_KEY)
-        ans = "Failed! Key has expireed";
+        ans = "Failed! Key has expired";
     return ans;
 }
 string LOGGER::currTime()

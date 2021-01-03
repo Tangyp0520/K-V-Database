@@ -55,12 +55,14 @@ void KVDBHandler::writeKVDBData(fstream& file, KVDBData& s)
 {
 	int keyLen = s.keyLen, valueLen = s.valueLen;
 	string key = s.key, value = s.value;
+	s.valueLen = s.value.length();
 
 	file.write((char*)&keyLen, sizeof(int));
 	file.write((char*)&valueLen, sizeof(int));
 
 	file.write(key.c_str(), keyLen);
 	file.write(value.c_str(), valueLen);
+	
 }
 
 void KVDBHandler::resetIndex()
@@ -145,7 +147,7 @@ int get(KVDBHandler* handler, const string& key, string& value)
 }
 int del(KVDBHandler* handler, const std::string& key)
 {
-	string value = "KEY_HAS_BEEN_DELETED";
+	string value;
 
 	int flag = get(handler, key, value);
 	if (flag != SUCCESS)
@@ -160,7 +162,8 @@ int del(KVDBHandler* handler, const std::string& key)
 
 	handler->writeKVDBData(file, s);
 	handler->index.set(key, handler->offset);
-	handler->offset += sizeof(int) * 2 + s.keyLen + s.valueLen;
+	handler->offset += sizeof(int) * 2 + s.keyLen;
+	handler->minHeap.set(key, KEY_NOT_EXIST_IN_MINHEAP);
 	file.close();
 	return SUCCESS;
 }

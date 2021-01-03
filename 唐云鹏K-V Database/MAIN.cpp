@@ -5,8 +5,6 @@
 #include"LOGGER.h"
 using namespace std;
 
-
-
 int main()
 {
 	KVDBHandler* handler;
