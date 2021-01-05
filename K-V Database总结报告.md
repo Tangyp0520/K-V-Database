@@ -474,17 +474,11 @@ KEY_NOT_EXIST_IN_MINHEAP必须比KEY_EXIST_IN_MINHEAP小
 
 程序交互页面如下(以退出程序为例)：
 
-![](C:\Users\唐云鹏\Desktop\程序交互页面.png)
-
-
+![](https://github.com/2019151091/K-V-Database/blob/main/%E7%A8%8B%E5%BA%8F%E4%BA%A4%E4%BA%92%E9%A1%B5%E9%9D%A2.png)
 
 K-V单位元在数据库中可能存在状态以及相应状态下set/get/del/expires函数操作后结果如下：
 
-![](C:\Users\唐云鹏\Desktop\K-V单位元可能存在状态以及函数操作结果.png)
-
-
-
-
+![](https://github.com/2019151091/K-V-Database/blob/main/K-V%E5%8D%95%E4%BD%8D%E5%85%83%E5%8F%AF%E8%83%BD%E5%AD%98%E5%9C%A8%E7%8A%B6%E6%80%81%E4%BB%A5%E5%8F%8A%E5%87%BD%E6%95%B0%E6%93%8D%E4%BD%9C%E7%BB%93%E6%9E%9C.png)
 
 针对其K-V单位元存在状态设计的测试方案以及预期结果如下：
 
@@ -517,4 +511,4 @@ K-V单位元在数据库中可能存在状态以及相应状态下set/get/del/ex
 
 在严格执行测试流程之后，程序相应反应如预期所料，日志文件中结果如下：
 
-![](C:\Users\唐云鹏\Desktop\进行测试之后日志文件内容.png)
+![](https://github.com/2019151091/K-V-Database/blob/main/%E8%BF%9B%E8%A1%8C%E6%B5%8B%E8%AF%95%E4%B9%8B%E5%90%8E%E6%97%A5%E5%BF%97%E6%96%87%E4%BB%B6%E5%86%85%E5%AE%B9.png)
